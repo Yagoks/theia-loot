@@ -92,7 +92,7 @@ async function onDeath(token) {
     const count = availableItems(token).length;
     yes = await foundry.applications.api.DialogV2.confirm({
       window: { title: "Theia Loot" },
-      content: `<p><b>${token.name}</b> morreu. Tornar o corpo saqueável?</p><p><small>${count} item(ns) droppable no corpo.</small></p>`,
+      content: `<p><b>${token.name}</b> has died. Make the body lootable?</p><p><small>${count} droppable item(s) on the body.</small></p>`,
       rejectClose: false
     });
   }
@@ -157,10 +157,10 @@ function canReach(token, looter) {
 
 export function openLoot(token) {
   token = token?.document ?? token;
-  if (!isLootable(token)) return ui.notifications.warn("Esse corpo não é saqueável.");
+  if (!isLootable(token)) return ui.notifications.warn("This body is not lootable.");
   const looter = looterFor();
-  if (!game.user.isGM && !looter) return ui.notifications.warn("Selecione o seu personagem para saquear.");
-  if (!canReach(token, looter)) return ui.notifications.warn("Chegue mais perto do corpo para saquear.");
+  if (!game.user.isGM && !looter) return ui.notifications.warn("Select your character to loot.");
+  if (!canReach(token, looter)) return ui.notifications.warn("Move closer to the body to loot it.");
   const existing = foundry.applications.instances.get(`theia-loot-${token.id}`);
   if (existing) return existing.bringToFront();
   new LootWindow(token).render(true);
@@ -223,7 +223,7 @@ async function take({ tokenUuid, itemId, actorUuid, userId, all }) {
   const who = game.users.get(userId)?.character?.name ?? recipient.name;
   ChatMessage.create({
     speaker: ChatMessage.getSpeaker({ actor: recipient }),
-    content: `<p><b>${who}</b> pegou de <b>${token.name}</b>: ${items.map(i => `${i.name}${(i.system.quantity ?? 1) > 1 ? ` ×${i.system.quantity}` : ""}`).join(", ")}.</p>`
+    content: `<p><b>${who}</b> took from <b>${token.name}</b>: ${items.map(i => `${i.name}${(i.system.quantity ?? 1) > 1 ? ` ×${i.system.quantity}` : ""}`).join(", ")}.</p>`
   });
 }
 
@@ -234,7 +234,7 @@ function onSocket(message) {
 
 function requestTake(payload) {
   if (game.user.isGM) return take({ ...payload, userId: game.user.id });
-  if (!game.users.activeGM) return ui.notifications.warn("O GM precisa estar online para pegar itens.");
+  if (!game.users.activeGM) return ui.notifications.warn("A GM must be online to take items.");
   game.socket.emit(SOCKET, { action: "take", ...payload, userId: game.user.id });
 }
 
@@ -261,21 +261,21 @@ class LootWindow extends foundry.applications.api.ApplicationV2 {
     const items = availableItems(this.token);
     const looter = looterFor();
     const rows = items.map(i => {
-      const name = (i.system.identified === false && !game.user.isGM) ? (i.system.unidentified?.name || "Item não identificado") : i.name;
+      const name = (i.system.identified === false && !game.user.isGM) ? (i.system.unidentified?.name || "Unidentified item") : i.name;
       const qty = i.system.quantity ?? 1;
       return `<li class="theia-loot-item" data-item-id="${i.id}">
         <img src="${i.img}" alt="">
         <span class="name">${name}${qty > 1 ? ` <small>×${qty}</small>` : ""}</span>
-        <button type="button" data-take="${i.id}"><i class="fa-solid fa-hand"></i> Pegar</button>
+        <button type="button" data-take="${i.id}"><i class="fa-solid fa-hand"></i> Take</button>
       </li>`;
     }).join("");
     const div = document.createElement("div");
     div.className = "theia-loot-body";
     div.innerHTML = `
       <header><img src="${this.token.texture.src}" alt=""><div><h3>${this.token.name}</h3>
-        <p>${looter ? `Saqueando como <b>${looter.name}</b>` : "Selecione um personagem para pegar itens."}</p></div></header>
-      ${items.length ? `<ul class="theia-loot-list">${rows}</ul>` : `<p class="empty">Não sobrou nada para pegar.</p>`}
-      ${items.length > 1 ? `<footer><button type="button" data-take-all><i class="fa-solid fa-hands"></i> Pegar tudo</button></footer>` : ""}`;
+        <p>${looter ? `Looting as <b>${looter.name}</b>` : "Select a character to take items."}</p></div></header>
+      ${items.length ? `<ul class="theia-loot-list">${rows}</ul>` : `<p class="empty">Nothing left to take.</p>`}
+      ${items.length > 1 ? `<footer><button type="button" data-take-all><i class="fa-solid fa-hands"></i> Take all</button></footer>` : ""}`;
     return div;
   }
 
@@ -287,7 +287,7 @@ class LootWindow extends foundry.applications.api.ApplicationV2 {
 
   _take(itemId, all = false) {
     const looter = looterFor();
-    if (!looter) return ui.notifications.warn("Selecione o seu personagem para pegar itens.");
+    if (!looter) return ui.notifications.warn("Select your character to take items.");
     requestTake({ tokenUuid: this.token.uuid, itemId, actorUuid: looter.uuid, all });
   }
 
