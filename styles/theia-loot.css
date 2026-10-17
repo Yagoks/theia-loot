@@ -1,0 +1,18 @@
+/* Theia Loot */
+.theia-loot-toggle { color: var(--color-text-light-6, #8a8a8a); }
+.theia-loot-toggle.active { color: #f2c14e; }
+.control-icon.theia-loot-hud.active i { color: #f2c14e; }
+
+.theia-loot .window-content { padding: 0.75rem; }
+.theia-loot-body header { display: flex; gap: 0.75rem; align-items: center; margin-bottom: 0.75rem; }
+.theia-loot-body header img { width: 56px; height: 56px; object-fit: contain; border: 0; }
+.theia-loot-body header h3 { margin: 0; border: 0; }
+.theia-loot-body header p { margin: 0.2rem 0 0; font-size: var(--font-size-12, 12px); opacity: 0.8; }
+.theia-loot-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.theia-loot-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0.5rem; border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(242, 193, 78, 0.18); }
+.theia-loot-item img { width: 36px; height: 36px; border: 0; flex: none; }
+.theia-loot-item .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.theia-loot-item button, .theia-loot-body footer button { flex: none; width: auto; white-space: nowrap; padding: 0 0.7rem; }
+.theia-loot-body footer { margin-top: 0.75rem; display: flex; justify-content: flex-end; }
+.theia-loot-body .empty { text-align: center; opacity: 0.7; font-style: italic; }
